@@ -1,0 +1,93 @@
+Haskell has static types and type inference
+
+:: is read as "has type of"
+4 == 5 :: Bool
+
+[Char] is a list of Chars
+
+Functions can (and should) have explicit type declaration
+
+-- Return a copy of a string with all its uppercase letters removed
+--  the :: [Char] -> [Char] says this function maps a string to a string
+removeNonUppercase :: [Char] -> [Char]
+removeNonUppercase st = [c | c <- st, c `elem` ['A'..'Z']]
+
+--With multiple parameters, you use multiple ->
+--The last type is the type of the output of the function
+addThree :: Int -> Int -> Int -> Int
+addThree x y z = x + y + z
+
+--Types in Haskell
+Int
+Integer (For really big ints, like 'long' in C)
+Float (single precision floats)
+Double (double precision of float)
+Bool
+Char
+
+--Type Variables
+Type the following in REPL
+  :t head
+You'll get 
+head :: [a] -> a
+
+The 'a' is a type variable, meaning that it can be any type,
+    so head will take a list of homogenous elements of 
+    any type and return a single value that is the same
+    type as the elements in the input list
+This is similar to generics in other languages like C
+  (vectors can hold int, char, bool, char*)
+
+--Typeclasses
+
+REPL
+  :t (==)
+Returns the following
+(==) :: (Eq a) => a -> a -> Bool
+
+Everything between the :: and => specifies a class constraint,
+  meaning that the input must obey the typeclass properties
+The expression should be read as 
+  "The equality takes two parameters that are the same type,
+  where that type is a member of the Eq class, and returns a Bool"
+
+Basic Typeclasses:
+
+  You say that type x is in Y typeclass
+  
+  Eq: equality testing (==, /=) ...note you don't use !=
+  Ord: ordering of elements
+  Show: members of this class can be presented as strings
+    call the show function on it to show it as a string
+    show 5.334
+    "5.334"
+  Read: members of this class can take a string and parse
+    it to a member of the class
+
+    read "True" || False
+    True
+
+    Note the type definition for read is
+    read :: (Read a) => String -> a
+
+    This means that if you don't specify which type
+      read should return, it is ambiguous and GHC 
+      might complain at you. You can explicity 
+      specifiy which type Read should make that 'a'
+      be with ::
+
+    read "5" :: Int
+    5
+    read "5" :: Float
+    5.0
+
+  Enum: enumeration (sequential orderings)
+    Members of Enum can be used for list ranges
+    ['a'..'e'] works because Char is in the Enum typeclass
+
+  Bounded: members have an upper and lower bound
+  Num: members can act like numbers
+  
+  Integral: only whole numbers (Int and Integer)
+    fromIntegral :: (Num b, Integral a) => a -> b
+  Floating: only floating pt numbers (Float and Double)
