@@ -24,6 +24,9 @@ Float (single precision floats)
 Double (double precision of float)
 Bool
 Char
+Maybe (represents an optional value...the value may be there
+     or it may not be. Similar to how a pointer can
+     point to an actual piece of memory or be NULL)
 
 --Type Variables
 Type the following in REPL
@@ -91,3 +94,4 @@ Basic Typeclasses:
   Integral: only whole numbers (Int and Integer)
     fromIntegral :: (Num b, Integral a) => a -> b
   Floating: only floating pt numbers (Float and Double)
+

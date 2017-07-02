@@ -1,0 +1,134 @@
+This chapter contains syntactic sugar in Haskell
+
+
+--4.1 Pattern Matching
+
+When you define a function, you can have different function bodies
+  for each "pattern"
+
+----------------------------------------------------------------
+| Patterns allow you to define a piecewise function in Haskell |
+----------------------------------------------------------------
+
+TODO: see if "pattern" can refer to different datatypes
+TODO: research overlapping patterns
+
+
+lucky :: (Integral a) => a -> String
+lucky 7 = "LUCKY NUMBER SEVEN!"
+lucky x = "Sorry, you're not the lucky one :("
+
+When you pass in an argument to lucky, the argument
+  will be tested against each pattern from top to 
+  bottom and if a pattern matches, that body is executed
+  
+
+--sayMe is written in a way that avoids a bunch of if/else branches
+
+sayMe :: ( Integral a ) = > a -> String
+sayMe 1 = " One ! "
+sayMe 2 = " Two ! "
+sayMe 3 = " Three ! "
+sayMe 4 = " Four ! "
+sayMe 5 = " Five ! "
+sayMe x = " Not between 1 and 5 "
+
+--The order of patterns matters: if the last pattern of sayMe
+--  was the first pattern, it would always trigger and none
+--  of the other patterns would trigger because the catch-all
+--  pattern was matched first
+
+--You should have every possible input have a pattern that matches it
+--A catch-all pattern as the last pattern prevents GHC from 
+--  complaining about "Non-exhuastive patterns" at runtimem if you 
+--  provide an argument to a function and that arg doesn't match 
+--  any pattern
+
+Pattern matching can be applied to tuples
+--Add two vectors together
+addVectors :: (Num a) => (a, a) -> (a, a) -> (a, a)
+addVectors (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+
+--A common style for pattern matchingn is to use _ if you don't
+--  care what the pattern matches to
+
+third :: (a, b, c) -> c
+third (_, _, z) = z
+
+--Pro tip: "as patterns"
+"As patterns" are useful if you want to match a pattern and 
+  bind matches to variables, but maintain a handy handle
+  on the whole pattern rather than building it again
+  with something like x:y:ys. (similar to $0 in awk)
+
+whole_match@(x:y:foo:bar:xs)
+
+capital :: String -> String
+capital "" = "Empty String!"
+capital all@(x:xs) = "The first letter of " ++ all ++ " is " ++ [x]
+
+
+You cannot use ++ in patterns
+
+
+
+
+--Pattern Matching and Recursion
+
+factorial :: (Integral a) => a -> a
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+
+
+
+
+
+--Pattern Matching and List Comprehension
+You can use pattern matching in list comphrensions
+xs = [some list of tuples]
+[a + b | (a, b) <- xs]
+
+If a pattern is not matched on an element in the source list,
+   that element is ignored and the next element is considered
+
+Note that x:xs will bind the head of the input list to x and the rest of the list to xs (since [1,2,3] is syntactic sugar for 1:2:3:[]). If the input list has only 1 element, then x will contain that element and xs will be empty. 
+
+Another head implementation: Non-degenerate pattern
+head' (x:_) = x
+
+Note that if you want to match against a variadic number of elements in the list, you need to surround the pattern in ()
+
+You can match against empty lists using [] pattern
+
+
+
+
+
+
+--4.2 Guards
+Patterns are for seeing if a value conforms to some form and deconstructing the match
+Guards are a method of testing whether the properties of a value are true or false 
+  (similar to if statements, but guards are sexier with patterns)
+
+bmiTell :: (RealFloat a) => a -> a-> String
+bmiTell weight / height
+  | weight / height ^ 2 <= 18.5 "Underweight"
+  | weight / height ^ 2 <= 25.0 "Normal weight"
+  | weight / height ^ 2 <= 30.0 "Overweight
+  | otherwise = "Fat AF"
+
+Guards are checked from top to bottom and once a guard is matched,
+  the rest of the guards are not considered
+
+"otherwise" is defined to just equal True and is a readable
+  way to include a catch-all guard
+
+If all of the guards of a patterh fail, evaluation falls through to the next pattern. If all guards and patterns fail, an error is thrown
+
+
+
+
+
+--4.3 Where Bindings
+TODO: finish this
+
