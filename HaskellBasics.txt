@@ -1,0 +1,91 @@
+If negative numbers are being dumb, try wrapping - in parens
+  -3 --> (-3)
+
+Functions in Haskell:
+  infix functions: the function is placed between operands
+    2 + 4
+    9 `div` 3
+    
+  prefix functions: the function is placed before operands
+  
+    In Haskell, functions are separated by spaces and operands are 
+      separated by spaces as well 
+    The spaces are for "functional application
+    
+    bar (bar 3) in Haskell is like bar(bar(3)) in C
+  
+    succ 8
+      succ is the successor function and returns the successor to the operand
+    min 9 10
+
+Lists:
+  lists are homogenous in Haskell (all must be same type)
+  strings are lists
+  someNumbers = [4,5,2,43,56,0]
+
+  Concatenating Lists: Use ++ operator
+    ['w', 'o'] ++ ['o', 't']
+    resolves to "woot"
+
+  Access element of a list by index: use !! operator
+
+    "Steve Buscemi" !! 6
+    resolves to 'B'
+
+  Lists can contain lists of lists of ... recursion bruh
+    The sublists can be of varying lengths but each sub list
+      must be the same type
+
+Common List Functions:
+
+  head: return first element
+
+    head [5,4,3,2,1]
+    5
+
+  tail: return every element that isn't the head
+
+    tail [5,4,3,2,1]
+      [4,3,2,1]
+
+  last: return last element
+
+
+  init: return a list with everything except it's last element
+
+  Empty lists are bad and won't be caught at compile time
+
+  length: return the length of the list
+
+    length [7,4,3,2,1]
+    5
+
+  null: Boolean check to see if the list is empty
+    (Use this instead of == [])
+    null []
+    True
+    null ['a', 'b', 'c']
+    False
+
+
+  reverse: reverses a list
+  
+    reverse [5,4,3,2,1]
+    [1,2,3,4,5]
+
+
+  take: Extracts a number of elments from the beginning of a list
+    Useful for infinite lists
+
+    take 3 [5,4,3,2,1]
+    [5,4,3]
+
+    take 0 [6,6,6]
+    0
+
+    This will take the first 10 multiples of 13
+    take 10 [13,26,..]
+    
+
+    
+
