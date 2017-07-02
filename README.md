@@ -1,7 +1,7 @@
 # HaskellStuff
 Notes for functional Programming in Haskell...Inspired by Learn You a Haskell
 
-#Installation Issues
+# Installation Issues
 For some reason the server hosting GHC for `stack setup`
   was not working on June 1st 2017 so I had to install GHC 
   through apt-get and modify the stack.yaml for the 
