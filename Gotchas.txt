@@ -1,0 +1,16 @@
+-- File for any Gotchas found while programming
+
+For if/else statements all paths must resolve to the 
+  same type of variable.
+
+fizzBuzz xs = [if (x `mod` 3 == 0 && x `mod` 5 == 0) then "FizzBuzz" 
+              else if x `mod` 3 == 0 then "Fizz"
+              else if x `mod` 15 == 0 then "Buzz"
+              else x
+              | x <- xs]
+
+This will result in compilation because the 
+  else x
+part is not a list of chars
+
+Although the above is probably some map function I should write

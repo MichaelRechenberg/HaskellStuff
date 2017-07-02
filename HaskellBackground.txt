@@ -8,6 +8,9 @@ Haskell is a compiled language
   Hugs is a Haskell REPL
 Haskell scripts have a .hs file extension
 
+Haskell has a mathematical feel to its notation
+  list comprehensions look like set definitions in Latex
+
 
 Append /usr/mrechenberg/.local/bin to PATH?
 
@@ -40,4 +43,20 @@ Stack is like SBT for Haskell
       OR
 
     stack repl
+
+    :l some-file.hs
+      loads a file into REPL so you can use functions within that file
+
+    :r
+      reload the current script
+
+    :t some-var
+      display the type of some-var
+
+    let
+      define a variable in REPL-land (think if it like in a proof)
+
+      let x = 3
+        is as if in a script you wrote
+      x = 3
 
