@@ -50,8 +50,10 @@ Pattern matching can be applied to tuples
 addVectors :: (Num a) => (a, a) -> (a, a) -> (a, a)
 addVectors (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
 
---A common style for pattern matchingn is to use _ if you don't
---  care what the pattern matches to
+-- The _ character will match anything and is useful
+--  if you don't care what that value is in the structure
+--  of the data type you're matching 
+-- This is similar to the * wildcard for *nix file globbing
 
 third :: (a, b, c) -> c
 third (_, _, z) = z
@@ -110,6 +112,7 @@ You can match against empty lists using [] pattern
 Patterns are for seeing if a value conforms to some form and deconstructing the match
 Guards are a method of testing whether the properties of a value are true or false 
   (similar to if statements, but guards are sexier with patterns)
+Guards are easier to read when testing for boolean conditions 
 
 bmiTell :: (RealFloat a) => a -> a-> String
 bmiTell weight / height

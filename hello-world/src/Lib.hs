@@ -39,5 +39,3 @@ playerReview (name, team, 20) = name ++ " is bit young, but perhaps "
 playerReview ("Uncle Bob", "Cubs", _) = "I didn't know he played"
 playerReview x = "Can't say anything definitively"
 
-
-

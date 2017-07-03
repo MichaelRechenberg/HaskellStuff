@@ -1,6 +1,7 @@
 module Main where
 
 import Lib
+import Sorts
 
 main :: IO ()
 main = do
@@ -17,5 +18,9 @@ main = do
   -- Should print "I didn't know he played"
   print(playerReview ("Uncle Bob", "Cubs", 55) )
   print(playerReview ("ASDF", "Invalid", (-1)) )
+  let asdf = "a quick brown fox jumped over the lazy dog"
+    in print(quickSort asdf)
+  let asdf = "a quick brown fox jumped over the lazy dog"
+    in print(mergeSort asdf)
 
 

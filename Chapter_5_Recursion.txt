@@ -1,0 +1,65 @@
+
+5.1 is skipped because it is basic recursion
+Haskell has no for or while loops LOL
+"In Haskell you declare what something is instead 
+  of declaring how you get it"
+
+
+--5.2 Maximum awesome
+
+Imperative vs Functional definition of max()
+
+  Imperative way (Python)
+
+  def mymax(x):
+    """Returns the maximum number in list x
+    """
+
+    if len(x) == 0:
+      raise SomeError
+
+    max_value = x[0] 
+
+    for value in x:
+      if value > max_value:
+        max_value = value
+
+    return max_value
+
+
+
+  Functional/Recursive Definition (Haskell)
+
+  mymax :: (Ord a) => [a] -> a
+  --Base cases 
+  mymax [] = error "Empty lists can't have a maximium value"
+  mymax [x] = x
+  --Recursive Case
+  mymax (x:xs)
+    | x > maxTail = x
+    | otherwise = maxTail
+    --maxTail is "the maximum of the rest of the list"
+    where maxTail = mymax xs
+
+
+  Using the built in maximum function
+
+  mymax :: (Ord a) => [a] -> a
+  --Base cases 
+  mymax [] = error "Empty lists can't have a maximium value"
+  mymax [x] = x
+  mymax (x:xs) = maximum x (mymax xs)
+
+
+  --Recall (x:xs) is a common Haskell pattern used to 
+  --  separate one element from the list of the list
+  -- (x:xs) separates a list into its head and tail
+  --Recall that (x:xs) will match if the list has only 1 element.
+  --  In that case, x will contain the element and xs == []
+
+  --Note that the base cases are covered by pattern matching
+  --  rather than a bunch of if statements for imperative langs
+
+See hello-world/src/Sorts.hs for quickSort in Haskell,
+    which is terse and arguably easier to understand
+    than the imperative quicksort

@@ -61,6 +61,8 @@ Lists:
     The sublists can be of varying lengths but each sub list
       must be the same type
 
+  : is the "cons" operator
+
 Common List Functions:
 
   head: return first element

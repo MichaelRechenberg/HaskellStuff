@@ -3,3 +3,17 @@ Concrete example of how refactoring easy:
   function that used map and didn't have to change
   anything in Main.hs because the interface remained
   the same
+
+When doing functional programming in Haskell, 
+  don't think about Place-Oriented-Programming (PLOP)
+We don't care where things are in memory and we aren't
+  telling the computer what to do, rather we say what the data
+  is and what transformations we are applying to it.
+For a concrete example, look at quickSort in src/Lib.hs
+  and how it never uses array indices or swaps elements in place:
+  you just say (run QS on all the elements smaller than the head
+  of the list)
+"PLOP" is accredited to Rich Hickey (creator of Clojure)
+
+Recrusive thinking:
+  For lists, think of head vs tail
