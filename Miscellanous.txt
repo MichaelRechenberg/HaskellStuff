@@ -1,0 +1,5 @@
+Concrete example of how refactoring easy:
+  I changed fizzBuzz from a list comprehension to a
+  function that used map and didn't have to change
+  anything in Main.hs because the interface remained
+  the same

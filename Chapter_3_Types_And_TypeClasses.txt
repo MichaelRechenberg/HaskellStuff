@@ -95,3 +95,5 @@ Basic Typeclasses:
     fromIntegral :: (Num b, Integral a) => a -> b
   Floating: only floating pt numbers (Float and Double)
 
+Later on you'll see how to make your own types (Algebraic Data Types)
+

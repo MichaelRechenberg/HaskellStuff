@@ -10,15 +10,23 @@ someFunc = putStrLn "someFunc"
 doubleUs :: Int -> Int -> Int
 doubleUs x y = 2*x + x*y
 
---Second attempt and FizzBuzz, defining types explicitly
---TODO: Use map to apply a function to each element of the list,
---  and have that function do the conversion logic
+--Third attempt at FizzBuzz, defining types explicity,
+--  using guards and where bindings, map function
 fizzBuzz :: [Int] -> [[Char]]
-fizzBuzz xs = [if (x `mod` 3 == 0 && x `mod` 5 == 0) then "FizzBuzz" 
-              else if x `mod` 3 == 0 then "Fizz"
-              else if x `mod` 15 == 0 then "Buzz"
-              else show x 
-              | x <- xs]
+fizzBuzz xs = map fizzBuzzHelper xs
+
+--Helper function that returns the appropriate string
+--  according to FizzBuzz rules
+fizzBuzzHelper :: Int -> [Char]
+fizzBuzzHelper x
+  | mod3 && mod5 = "FizzBuzz"
+  | mod3         = "Fizz"
+  | mod5         = "Buzz"
+  | otherwise    = show x
+  where
+    mod3 = x `mod` 3 == 0
+    mod5 = x `mod` 5 == 0
+
 
 --Silly function that returns a "review" of the player
 -- (Player name, team, age)

@@ -8,6 +8,7 @@ When you define a function, you can have different function bodies
 
 ----------------------------------------------------------------
 | Patterns allow you to define a piecewise function in Haskell |
+| Pattern matching also gets sexier with Algebraic Data Types  |
 ----------------------------------------------------------------
 
 TODO: see if "pattern" can refer to different datatypes
@@ -130,5 +131,89 @@ If all of the guards of a patterh fail, evaluation falls through to the next pat
 
 
 --4.3 Where Bindings
-TODO: finish this
 
+Where bindings allow you to bind values to variables
+  that are visible ACROSS guards
+Where bindings are only visible to the function in which
+  they are defined (won't pollute namespace)
+
+fizzBuzzHelper :: Int -> [Char]
+fizzBuzzHelper x
+  | mod3 && mod5 = "FizzBuzz"
+  | mod3         = "Fizz"
+  | mod5         = "Buzz"
+  | otherwise    = show x
+  where
+    mod3 = x `mod` 3 == 0
+
+Where bindings can pattern match
+Where bindings can be nested (helper functions have their own
+  where clauses)
+
+
+--4.4 Let Bindings
+
+Let bindings allow for binding anywhere
+Let bindings can pattern match
+Let bindings are very local (don't span across guards)
+Let bindings are expressions whereas where bindings are syntactic sugar
+
+Syntax For Let Bindings:
+
+  let <bindings> in <expression>
+
+  All bindings made in <bindings> are available in
+    the <expression> block and valid there only
+
+  To define multipel variables inline, separate them by ;
+  (let foo="Hey "; bar = " there "; baz = "buddy!" in foo ++ bar ++ baz)
+
+Let bindings are useful for dismantling tuples
+(let (x,y,z) = (1,2,3) in x^2 + y^2 + z^2)
+
+Let bindings can be put in list comprehensions
+xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2 ] 
+--xs contains bmis of only fat people
+xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2, bmi >= 25.0]
+  The variables bound in the let statement are visible
+  to the output function (stuff to the left of | ) as well
+  as other predicates
+
+
+
+
+--4.5 Case Expressions
+
+Similar to case expressions in imperative languages,
+  but with the added ability of pattern matching
+
+
+Syntax for case statements:
+
+  case expression of pattern -> result
+                     pattern -> result
+                     pattern -> result
+                     ...
+
+  "expression" is matched against the patterns 
+    in a top to bottom fashion, returning the
+    result of the pattern matched or raising a 
+    runtime error if no patterns were matched
+
+
+
+Case expressions can pretty much go anywhere 
+  (whereas pattern matching of function parameters
+   can only occur when defining functions...
+   after all pattern matching in function definitions
+   is just syntactic sugar for case expressions)
+
+  describeList :: [a] -> String
+  describeList xs = "The list is " ++ case xs of []  -> "empty."
+                                                 [x] -> "a singleton."
+                                                 xs  -> "a longer list."
+  describeList :: [a] -> String
+  describeList xs = "The list is " ++ what xs
+    where what []  = "empty."
+          what [x] = "a singleton list."
+          what xs  = " a longer list."
