@@ -1,5 +1,10 @@
 module Lib
-    ( someFunc, fizzBuzz, doubleUs, playerReview
+    ( someFunc, 
+      fizzBuzz, 
+      doubleUs, 
+      playerReview, 
+      storyLengthr, 
+      storyLengthl
     ) where
 
 import Data.Char
@@ -38,4 +43,25 @@ playerReview (name, team, 20) = name ++ " is bit young, but perhaps "
                                 ++ team ++ " needs some new blood"
 playerReview ("Uncle Bob", "Cubs", _) = "I didn't know he played"
 playerReview x = "Can't say anything definitively"
+
+
+--Note how the difference in lambda expressions in the 2 functions
+--  below (reflective of the type definitions for foldl and foldr)
+
+--Calculates the 'total' length of a list of strings (a story)
+--  by adding up the length of each string to the overall total
+--  using foldr
+storyLengthr :: [[Char]] -> Int
+storyLengthr [] = 0
+storyLengthr xs = foldr (\phrase accum -> length phrase + accum) 0 xs
+
+
+--Calculates the 'total' length of a list of strings (a story)
+--  by adding up the length of each string to the overall total
+--  using foldl
+storyLengthl :: [[Char]] -> Int
+storyLengthl [] = 0
+storyLengthl xs = foldl (\accum phrase -> length phrase + accum) 0 xs
+
+
 

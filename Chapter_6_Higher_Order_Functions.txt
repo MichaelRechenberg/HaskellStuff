@@ -1,0 +1,427 @@
+As part of being FP, functions are first-class citizens
+  (they can be stored in a variable, passed as an argument
+   to a function)
+
+Higher order fuctions are functions that take functions as args 
+  or return a function as a result
+
+
+
+--6.1 Curried Functions
+
+
+All functions in Haskell take one argument...but
+  we've written may functions that take more than one arg.
+  The trick to this is that all functions in Haskell
+  are curried
+
+
+Currying: the process of transforming a function that takes 
+  multiple arguments into a function that takes just a single 
+  argument and RETURNS ANOTHER FUNCTION if arguments
+  are still needed.
+
+  f :: a -> b -> c
+  is the curried version of
+  f :: (a, b) -> c
+
+
+Haskell have `curry` and `uncurry` functions
+
+
+Left/right associativity applies to how operations
+  are grouped when their precedence is the same
+
+  Arrows -> in type definition are Right associative
+  f :: a -> b -> c
+  is equivalent to
+  f :: a -> (b -> c)
+
+  Function application (a space between args) is Left associative
+  f x y 
+  is equivalent to
+  (f x) y
+
+
+Note: Currying is not the same as partial application, but similar
+Partial Application: The process of passing in less
+  arguments than a function requires, resulting
+  in a function being returned that can later
+  be applied with more arguments to fulfill the
+  original function's arity.
+
+Infix functions can be partially applied (Google the syntax)
+
+Remember the maxim: 
+  "Functions are not partial, you can partially apply a function"
+
+  Example:
+  
+  -- Let's define your run of the mill add function
+  -- It takes two arguments
+  add :: Int -> Int -> Int
+  add x y = x + y
+
+  -- But what if we pass only one argument to our `add` function?
+  addOne = add 1
+  :t addOne 
+      addOne :: Int -> Int
+
+  --addOne is a variable that holds a partially applied function,
+  --  hence why it's type is :: Int -> Int
+  --If we apply another argument to addOne, we will 
+  --  use that argument for all of the "y" variables
+  --  in add's function body (add 1 to the argument)
+  addOne 7
+  8
+  addOne 3 5
+  --Applied too many arguments, an error occurs
+  <interactive>:7:1:
+      Couldn't match expected type ‘Integer -> t’ with actual type ‘Int’
+      Relevant bindings include it :: t (bound at <interactive>:7:1)
+      The function ‘addOne’ is applied to two arguments,
+      but its type ‘Int -> Int’ has only one
+      In the expression: addOne 2 3
+      In an equation for ‘it’: it = addOne 2 3
+
+
+
+-- 6.2 Silly Examples of Higher Order Functions
+
+-- Take a function and apply it twice to an argument
+
+applyTwice :: (a -> a) -> a -> a
+applyTwice f x = f (f x)
+
+applyTwice ("HYPER " ++) "LUL"
+"HYPER HYPER LUL"
+
+--Here's some partial application for ya
+let addDoubleHype = applyTwice ("HYPER " ++)
+addDoubleHype "Lets Go Champ!"
+"HYPER HYPER Lets Go Champ!"
+
+
+-- 6.3 Useful Higher Order Functions
+
+Higher order functions are often easier replacements
+  for loop constructs of an imperative language
+  to accomplish the same task
+
+Haskell's `zipWith` takes a function and two lists as arguments,
+  returning a list where the function is applied to corresponding
+  elements in the two lists
+
+  --Apply the max function to corresponding elements
+  --  (elements at the same index)
+  zipWith max [1..5] [1,1,1,7,7]
+  [1,2,3,7,7]
+
+  flip: takes a function and returns a function similar
+    to the input function, except the first 2
+    arguments are flipped
+
+
+--6.3.1 Maps and Filters
+
+`map` is a higher order function that takes a function and a list
+  as arguments and returns a list where the function provided
+  was applied to every element in the list
+
+  map :: (a->b) -> [a] -> [b]
+  map _ [] = []
+  map f (x:xs) = f x : map f xs
+
+  --Recall : is the 'cons' operator (construction)
+  -- and in this context, it appends an element to the head of list
+  --Recall (x:xs) is a pattern that matches a list and binds
+  --  x to the head of the list
+  --  xs to the (possibly empty) tail of the list
+
+  map (++ "!") ["Snap", "Crackle", "Pop"]
+  ["Snap!", "Crackle!", "Pop!"]
+
+  -- The previous example could have been written as a 
+  --    list comprehension, but when you have maps of maps
+  --    it gets messier to stay with purely list comprehensions
+
+
+`filter` is a function that takes a predicate (a function
+  that tells whether something is true or not) and a list,
+  returning a list of elements from the input list
+  that passed the filtering predicate
+
+  filter :: (a -> Bool) -> [a] -> [a]
+  filter _ [] = []
+  filter p (x:xs)
+    | p x         = x : filter p xs
+    | otherwise   = filter p xs
+
+
+  --Taken from Learn You a Haskell (56-57)
+  filter (`elem` ['A'..'Z']) "i lauGh At You BecAuse u r aLL the Same"
+  "GAYBALLS"
+
+
+
+--6.4 Lambda Expressions
+
+Lambda expressions are for anonymous functions, saves on typing
+
+--The \ is supposed to look like the Greek letter lambda
+\x -> x - 7
+\x y -> x + y
+
+-- Typically the lambda expression is wrapped in () for readability
+map (\x -> x + 3) [1..5]
+[4,5,6,7,8]
+
+Note lambdas are sometimes overused. The above example rewritten:
+map (+3) [1..5]
+
+
+TODO: Look at closure, combinators, free variables, lambda calculus
+
+
+
+
+
+--6.5 Folds (the "reduce" in Map-Reduce)
+
+Folding combines elements of a data structure using some 
+  provided combining function and a default value. The data structure
+  is typically a list but can be anything (trees).
+
+
+fold (+) [1..5]
+15
+
+`fold` assumes the combining function is associative
+  (grouping doesn't matter... (a + b) + c == a + (b + c) )
+  In the general case, combining functions may only 
+  be associative in one way (left or right).
+  Haskell has foldr, foldl, and foldl' to address these issues.
+  Below are the patterns used for defining foldr and foldl
+
+  Note: review lazy evaluation if folding behavior
+    is a bit confusing
+
+  z is the value we want to use in the base case
+
+  --Right fold
+    foldr :: (a -> b -> b) -> b -> [a] -> b
+    foldr f z []      = z
+    foldr f z (x:xs)  = f x (foldr f z xs)
+
+
+
+    Note: foldr (:) [] is the identity function for lists
+
+      foldr (:) [] [1,2,3,4,5]
+        1 : (foldr (:) [] [2,3,4,5])
+          2 : (foldr (:) [] [3,4,5])
+            3 : (foldr (:) [] [4,5])
+              4 : (foldr (:) [] [5])
+                5 : (foldr (:) [] [])
+                5 : []
+                [5]
+              4:[5]
+            3:[4,5]
+          2:[3,4,5]
+        1:[2,3,4,5]
+      [1,2,3,4,5]
+
+      scanr (:) [] [1..5]
+      [[1,2,3,4,5],[2,3,4,5],[3,4,5],[4,5],[5],[]]
+
+
+    --Stack overflow when trying to go from x1 to xn if n is large
+    foldr recursion: 
+      f x1 (f x2 (f x3 (...(f xn z) ...)))
+
+
+  --Left fold
+    --Note how the combining functions ordering of arguments
+    --  is different than foldr, which is (a -> b -> b)
+    foldl :: (a -> b -> a) -> a -> [b] -> a
+    foldl f z []      = z
+    foldl f z (x:xs)  = foldl f (f z x) xs
+
+
+    Note: foldl can be used with flip to reverse a list
+
+    foldl (flip (:)) [] [1,2,3,4,5]
+      foldl (flip (:)) ((flip (:)) [] 1) [2,3,4,5]
+      foldl (flip (:)) (1:[]) [2,3,4,5]
+      foldl (flip (:)) [1] [2,3,4,5]
+        foldl (flip (:)) ((flip (:)) [1] 2) [3,4,5]
+        foldl (flip (:)) (2:[1]) [2,3,4,5]
+        foldl (flip (:)) [2,1] [3,4,5]
+          foldl (flip (:)) ((flip (:)) [2,1] 3) [4,5]
+          foldl (flip (:)) (3:[2,1]) [4,5]
+          foldl (flip (:)) [3,2,1] [4,5]
+            foldl (flip (:)) ((flip (:)) [3,2,1] 4) [5]
+            foldl (flip (:)) (4:[3,2,1]) [5]
+            foldl (flip (:)) [4,3,2,1] [5]
+              foldl (flip (:)) ((flip (:)) [4,3,2,1] 5) []
+              foldl (flip (:)) (5:[4,3,2,1]) []
+              --Base case:
+              --foldl returns z up recursion chain, 
+              --  which is [5,4,3,2,1]
+              foldl (flip (:)) [5,4,3,2,1] []
+
+    [5,4,3,2,1]
+
+
+    scanl (flip (:)) [] [1,2,3,4,5]
+    [[],[1],[2,1],[3,2,1],[4,3,2,1],[5,4,3,2,1]]
+
+
+    --Stack overflow when trying to go from xn to x1 if n is large
+    foldl recursion:
+      f (... (f ( f (f z x1) x2) x3) ...) xn
+
+
+
+  Note: One important thing to note in the presence of lazy, 
+    or normal-order evaluation, is that foldr will immediately 
+    return the application of f to the recursive case of folding 
+    over the rest of the list: in other words, the (foldr f z xs) 
+    is evaluated first. Thus, if f is able to produce
+    part of its result without reference to the recursive case, 
+    and the rest of the result is never demanded, then the recursion 
+    will stop. This allows right folds to operate on infinite lists. 
+    By contrast, foldl will immediately call itself with new 
+    parameters until it reaches the end of the list. This 
+    tail recursion can be efficiently compiled as a loop, 
+    but can't deal with infinite lists at all -- it will recurse 
+    forever in an infinite loop. Another technical point to be aware 
+    of in the case of left folds in a normal-order evaluation 
+    language is that the new initial parameter is not being evaluated 
+    before the recursive call is made. This can lead to stack 
+    overflows when one reaches the end of the list and tries to 
+    evaluate the resulting gigantic expression. For this reason, 
+    such languages often provide a stricter variant of left folding 
+    which forces the evaluation of the initial parameter before 
+    making the recursive call, in Haskell, this is the foldl' 
+    (note the apostrophe) function in the Data.List library. 
+    Combined with the speed of tail recursion, 
+    such folds are very efficient when lazy evaluation of 
+    the final result is impossible or undesirable.
+
+  Example:
+
+    inf = [1..]
+
+    --This results in nothing being printed and eventually 
+    --  getting a stack overflow because scanr is trying
+    --  to get down to xn to evaluate the most nested 
+    --  part of the recursion before evaluating 
+    --  xn-1, xn-2, ... x2, x1
+    scanr (+) 0 inf
+
+    --This results in a list of 1,3,5,9... being printed
+    --  until eventually getting a stack overflow 
+    --  because scanl is trying
+    --  to reach xn after evaulating x1, x2, x3 ... xn-1
+    scanl (+) 0 inf
+
+
+  See: 
+    https://wiki.haskell.org/Foldr_Foldl_Foldl%27
+    https://en.wikipedia.org/wiki/Fold_(higher-order_function)
+
+  Try foldr first if you don't know which to use 
+    (can deal with infinite lists)
+
+  foldl' has better time and space constraints than foldl,
+    but reverses the list (not an issue if your 
+    combining function is associative)
+
+  Often it's a choice between foldr or foldl'
+      This is because foldl' forces
+      strict application of the operator (start 
+      with innermost brackets and work outwards). This ensures
+      that each step of the fold is forced to 
+      "weak head normal form" before being applied,
+      avoiding the collection of thunks that would
+      otherwise occur.
+
+
+
+
+TODO: performance with fold foldr, foldl, foldl'
+TODO: look into redex's (reducible expressions)
+TODO: foldt for tree-like folding
+
+
+--6.5.1 scanr and scanl
+
+scanr and scanl are like fold functions, except they report
+  on the intermediate values recorded 
+
+
+--scanl applies foldl to every initial segment of the list
+scanl (+) 0 [3,5,2,1]
+[0, 0 + 3, (0 + 3) + 5, ((0 + 3) + 5) + 2, (((0 + 3) + 5) + 2) + 1]
+[0,3,8,10,11]
+
+Note: last (scanl f z xs) == foldl f z xs
+
+
+--scanr applies foldr to every tail segment of the list, 
+--  beginning with the longest
+scanr (+) 0 [3,5,2,1]
+[3 + (5 + (2 + (1 + 0)), 5 + (2 + (1+0)), 2 + (1+0), 1 + 0, 0]
+[11,8,3,1,0]
+
+Note: head (scanr f z xs) == foldr f z xs
+
+
+See: http://www.cantab.net/users/antoni.diller/haskell/units/unit06.html
+
+
+
+--6.6 Function application with $
+
+($) :: (a -> b) -> a -> b
+f $ x = f x
+
+
+$ is just regular function application, except that $
+  has very low precedence and is right associative 
+  (whereas using space for function application has
+   very high precedence and is left associative)
+  function application has very high precedence
+
+The main benefit of $ is to avoid using so many parenthesis
+
+sum (filter (>10) (map (*2) [2..10]))
+sum $ filter (>10) $ map (*2) [2..10]
+
+
+But because $ is function application, we can pass it into
+  higher orderfunctions like map to map function application
+  over a list of functions
+
+map ($ 3) [(4+), (10*), (^2), sqrt]
+[7.0, 30.0, 9.0, 1.73205asfdsadf]
+
+
+
+
+--6.7 Function Composiition
+
+f(g(x)) or (f o g)(x)
+Function composition is right associative
+Done in haskell useing the . function
+
+--Note the ordering of types in this declaration
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+
+
+Function composition in . is used for "point free style"
+Lambda expressions could be used instead of using . , the 
+  choice is stylistic
+

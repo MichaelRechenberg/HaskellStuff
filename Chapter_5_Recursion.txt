@@ -63,3 +63,8 @@ Imperative vs Functional definition of max()
 See hello-world/src/Sorts.hs for quickSort in Haskell,
     which is terse and arguably easier to understand
     than the imperative quicksort
+
+If your recursion utilizies tail recursion (the call to the recursive
+    case is the last line of the body) compilers in many 
+    languages can optimize execution by not having to setup another 
+    stack frame #CS233.

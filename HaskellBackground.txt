@@ -1,6 +1,9 @@
 Haskell if purely functional (if you say x = 5, x cannot equal anything else on a later line)
 
-Haskell has lazy evaluation
+Haskell has lazy evaluation, so expressions are only
+  evaluated when the resulst are needed. 
+  To get more in-depth, research the "thunk" datastructure
+
 Haskell is statically typed (no Python ducktyping here)
   Haskell has type inference ( a = 5 + 4 --> Haskell knows a is a number)
 Haskell is a compiled language
@@ -10,6 +13,23 @@ Haskell scripts have a .hs file extension
 
 Haskell has a mathematical feel to its notation
   list comprehensions look like set definitions in Latex
+
+Haskell is non-strict, so reduction proceeds from the 
+  outside, goingg inwards. 
+  If you have (a+(b*c)) that means you 
+  reduce the (+), 
+  then the inner (b*c).  
+  In contrast, strict languages have you start
+  at the innermost brackets (b*c) and then work outwards.
+
+  The `seq` primitive can force an expression to evaluate
+    regardless if it is ever used
+
+
+TODO: Look up "referential transparency" 
+  (replace function with its final output and the code
+   functions the exact same way b/c no side effects)
+
 
 
 Append /usr/mrechenberg/.local/bin to PATH?
