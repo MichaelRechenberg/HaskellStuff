@@ -7,7 +7,8 @@ module Lib
       storyLengthl,
       myCompress,
       makeClosure, 
-      pack
+      pack,
+      encode
     ) where
 
 import Data.Char
@@ -87,7 +88,7 @@ myCompress x = foldr (\z accum -> if z == (head accum) then accum else z:accum) 
 
 
 
---Haskell 99?'s #9 (Solution taken from cheat sheet)
+--Haskell 99?'s #9 (Solution modified from cheat sheet)
 --Pack consecutive uplicates of list elements into sublists
 -- pack['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
 -- ["aaaa", "b", "cc", "aa", "d", "eeee"]
@@ -95,9 +96,31 @@ myCompress x = foldr (\z accum -> if z == (head accum) then accum else z:accum) 
 --span will take a list and a predicate and return a list of 2 lists,
 --  the first of which is the longest prefix for which the prefix held
 --  and the second is the remainder of the input list
-pack (x:xs) = let (first, rest) = span (==x) xs
-              in (x:first) : pack rest
-pack []     = []
+
+--Note: The Haskell library function Data.List.group does exactly this
+pack :: (Eq a) => [a] -> [[a]]
+pack (x:xs) = 
+          let (first, rest) = span (==x) xs
+          in 
+            if null rest then
+              [(x:first)]
+            else
+              (x:first) : pack rest
+pack []     = [[]]
+
+
+
+--Haskell 99?'s #10 
+--Length-encode a list
+--encode "aaaabccaadeeee"
+--[(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
+encode :: (Eq a) => [a] -> [(Int, a)]
+encode [] = []
+encode xs = 
+            let genTuple = (\x -> ((length x), (head x)))
+            in
+              map genTuple $ pack xs
+
 
         
 

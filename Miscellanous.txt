@@ -17,3 +17,9 @@ For a concrete example, look at quickSort in src/Lib.hs
 
 Recrusive thinking:
   For lists, think of head vs tail
+
+
+TODO: look at more list functions (groupBy, sortBy, union,
+    \\ for list difference, zipWith7, unzipWith4)
+
+Especially Data.List.partition
