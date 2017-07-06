@@ -25,10 +25,36 @@ Haskell is non-strict, so reduction proceeds from the
   The `seq` primitive can force an expression to evaluate
     regardless if it is ever used
 
+Referential transparency: the property of a function saying that
+  if you replace the function with its output and the overall
+  program does not change.  This implies that a referentially
+  transparent function ALWAYS gives the same output for the
+  same input and that the function cannot have any side effects.  
+  All mathematical functions (2*3, sin(2*pi)) are
+  referentially transparent...whether you're running on 
+  EC2 or your laptop, no matter what color your shirt is,
+  no matter what the environment, the function always 
+  outputs the same result (6, 0).  Referentially transparent
+  functions can be evaluated at any time (since they depend
+  solely on inputs, not on external environments), which is
+  how Haskell can do lazy evaluation.
+  getInput(keyBoard) would not be referentially transparent
 
-TODO: Look up "referential transparency" 
-  (replace function with its final output and the code
-   functions the exact same way b/c no side effects)
+  Referential transparency makes static code analysis easier,
+  meaning that compilers can optimize much more aggressively
+  than programs in imperative programming.
+
+Idempotence: In the context of FP, an idempotent function
+  is a function such that repeated applications have the same
+  result as if the function was applied only once.
+
+  f(f(x)) == f(x) == f(f(f(x)))
+  Deleting a record by GUID in a database is Idempotent since
+    if you delete the record again using the same GUID,
+    the row remains deleted.
+
+  An idempotent function doesn't mean its pure (setting the text
+    of a text box to the same text)
 
 
 

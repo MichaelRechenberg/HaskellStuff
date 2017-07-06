@@ -4,10 +4,14 @@ module Lib
       doubleUs, 
       playerReview, 
       storyLengthr, 
-      storyLengthl
+      storyLengthl,
+      myCompress,
+      makeClosure, 
+      pack
     ) where
 
 import Data.Char
+import Data.List
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -64,4 +68,52 @@ storyLengthl [] = 0
 storyLengthl xs = foldl (\accum phrase -> length phrase + accum) 0 xs
 
 
+--Haskell 99?'s #7, solution taken from 99 questions solution
+--Look at concat function, concatMap
+--concat: concat all elements in a container of lists
+--concatMap: Map a function over all elements in a container and concatenate the results
+data NestedList a = Elem a | List [NestedList a]
+flatten :: NestedList a -> [a]
+flatten (Elem x) = [x]
+flatten (List x) = concatMap flatten x
 
+
+--Haskell 99?'s #8
+--Remove neighboring duplicate entries from a list
+--myCompress "aaabccaaddeee" == "abcade"
+myCompress :: (Eq a) => [a] -> [a]
+myCompress [] = []
+myCompress x = foldr (\z accum -> if z == (head accum) then accum else z:accum) [last x] x
+
+
+
+--Haskell 99?'s #9 (Solution taken from cheat sheet)
+--Pack consecutive uplicates of list elements into sublists
+-- pack['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
+-- ["aaaa", "b", "cc", "aa", "d", "eeee"]
+
+--span will take a list and a predicate and return a list of 2 lists,
+--  the first of which is the longest prefix for which the prefix held
+--  and the second is the remainder of the input list
+pack (x:xs) = let (first, rest) = span (==x) xs
+              in (x:first) : pack rest
+pack []     = []
+
+        
+
+
+--Closure example
+--x will be bound to the closure when makeClosure is called
+--y is a free variable  
+--
+--bind 7 to x
+--add7 = makeClosure 7
+--
+--bind 32 to y
+--add7 32
+--39
+--bind 21 to y, x is still bound to 7 for the closure
+--add7 21
+--28
+makeClosure :: (Num a) => a -> a -> a
+makeClosure x = (\y -> (x + y))

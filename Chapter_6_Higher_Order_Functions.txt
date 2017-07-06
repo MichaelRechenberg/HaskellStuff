@@ -31,6 +31,7 @@ Haskell have `curry` and `uncurry` functions
 
 Left/right associativity applies to how operations
   are grouped when their precedence is the same
+  (i.e. where to start putting parenthesis)
 
   Arrows -> in type definition are Right associative
   f :: a -> b -> c
@@ -209,9 +210,16 @@ fold (+) [1..5]
   z is the value we want to use in the base case
 
   --Right fold
+
+    --Right-associative operators
+
     foldr :: (a -> b -> b) -> b -> [a] -> b
     foldr f z []      = z
     foldr f z (x:xs)  = f x (foldr f z xs)
+
+
+    foldr (-) 0 [10,20,30]
+    10-(20-(30-0)))
 
 
 
@@ -241,6 +249,10 @@ fold (+) [1..5]
 
 
   --Left fold
+
+    --Left-associative operators
+
+
     --Note how the combining functions ordering of arguments
     --  is different than foldr, which is (a -> b -> b)
     foldl :: (a -> b -> a) -> a -> [b] -> a
@@ -280,6 +292,12 @@ fold (+) [1..5]
     --Stack overflow when trying to go from xn to x1 if n is large
     foldl recursion:
       f (... (f ( f (f z x1) x2) x3) ...) xn
+
+      foldl (-) 0 [10,20,30]
+      ((0-10)-20)-30
+
+
+    --Note: division and subtraction are left associative by default
 
 
 
@@ -331,21 +349,22 @@ fold (+) [1..5]
     https://wiki.haskell.org/Foldr_Foldl_Foldl%27
     https://en.wikipedia.org/wiki/Fold_(higher-order_function)
 
-  Try foldr first if you don't know which to use 
-    (can deal with infinite lists)
+  Choosing foldr, foldl, foldl' if your operation is associative:
+    Try foldr first if you don't know which to use 
+      (can deal with infinite lists)
 
-  foldl' has better time and space constraints than foldl,
-    but reverses the list (not an issue if your 
-    combining function is associative)
+    foldl' has better time and space constraints than foldl,
+      but reverses the list (not an issue if your 
+      combining function is associative)
 
-  Often it's a choice between foldr or foldl'
-      This is because foldl' forces
-      strict application of the operator (start 
-      with innermost brackets and work outwards). This ensures
-      that each step of the fold is forced to 
-      "weak head normal form" before being applied,
-      avoiding the collection of thunks that would
-      otherwise occur.
+    Often it's a choice between foldr or foldl'
+        This is because foldl' forces
+        strict application of the operator (start 
+        with innermost brackets and work outwards). This ensures
+        that each step of the fold is forced to 
+        "weak head normal form" before being applied,
+        avoiding the collection of thunks that would
+        otherwise occur.
 
 
 
@@ -424,4 +443,49 @@ f . g = \x -> f (g x)
 Function composition in . is used for "point free style"
 Lambda expressions could be used instead of using . , the 
   choice is stylistic
+
+
+--6.Extra: Closures
+
+
+Closures are a way for functions to refer to a free variable
+  within their scope
+In programming languages, closures (also lexical closures or function closures) 
+   are techniques for implementing lexically scoped name binding in languages 
+   with first-class functions. Operationally, a closure is a record storing 
+   a function together with an environment, a mapping associating each free variable 
+   of the function (variables that are used locally, but defined in an enclosing scope) 
+   with the value or reference to which the name was bound when the closure was created.
+   A closure—unlike a plain function—allows the function to access those captured 
+   variables through the closure's copies of their values or references, even 
+   when the function is invoked outside their scope.
+
+Note: Closures don't break referential transparency on its own. In Haskell,
+  declared variables are immutable and so if a closure refers to a 
+  statically bound free variable, referential transparency is maintained.
+  However, in Javascript destructive assignment is allowed (var x = 7; x = -1;),
+  so closures that use x as a free variable are no longer referentially transparent
+
+Closures appear similar to partial application, but closures are a bit different
+
+
+Free variable = variables not bound that are used within an expression
+  makeClosure :: (Num a) => a -> a -> a
+  makeClosure x = (\y -> x + y)
+  --In this example, y is a free variable and x is bound to the expression
+  --  when makeClosure is called. Note that the value of x is bound, 
+  --  not that "x" will refer to some variable named "x" in the closure
+  --  #ReferentialTransparency
+
+  add7 = makeClosure 7
+  add7 21
+  28
+
+  x = -99
+  add7 21
+  28
+
+  y = -88
+  add7 21
+  28
 
