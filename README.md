@@ -13,3 +13,5 @@ For some reason the server hosting GHC for `stack setup`
 
 If I wanted to have these changes be global, I'd have to update
   ~/.stack/global-project/stack.yaml with the same settings
+
+
