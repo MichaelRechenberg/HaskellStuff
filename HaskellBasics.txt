@@ -205,6 +205,8 @@ Generating Lists:
       replicate 3 10
       [10, 10, 10]
 
+   nub: Removes duplicate entries from the list...O(n^2)
+
 List Comprehension:
 
 You can define lists in a manner to how sets are defined in math

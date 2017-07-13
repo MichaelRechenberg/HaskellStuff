@@ -1,0 +1,206 @@
+This chapter is about modules in Haskell: how to import and
+  export functions as well as useful modules from
+  the Haskell Prelude
+
+
+--7.1 Loading Modules
+
+Haskell modules is a collection of related functions, types, and typeclasses
+Haskell programs are collections of modules where the main module
+  loads up the other modules and executes functions
+
+To import a module, the syntax is
+  import <module_name>
+  import Data.List
+  import Data.List (nub, sort)
+
+
+
+--7.2 Data.List Module
+
+  Part of Prelude
+
+  intersperse: take an element and a list and then puts that element 
+    between each pair of elemnents in the list
+
+    intersperse :: a -> [a] -> [a]
+
+    intersperse ',' "abcde" == "a,b,c,d,e"
+
+
+  intercalate: takes a list of lists and a list, insert that list in
+    between all of those listsand flatten the results
+
+    intercalate :: [a] -> [[a]] -> [a]
+
+    intercalate " " ["hey", "there", "guys"] == "hey there guys"
+
+
+  transpose: transpose a list of lists (like a matrix)
+
+  foldl', fold1', foldr', foldr1' are strict versions
+    of their respective lazy versions
+
+  concat: flatten a list of lists into a list of just elements
+    this only removes one level of nesting
+
+    concat :: (Foldable t) => t [a] -> [a]
+    concat [ [3,4,5], [2,3,4], [2,1,1] ] == [3,4,5,2,3,4,2,1,1]
+
+  concatMap: same as concat but you first map a function to the
+    list and then concatentate
+
+    concatMap :: (Foldable t) => (a -> [b]) t a -> [b]
+
+
+  any, all: Takes a predicate and returns a boolean saying if any, all
+    elements of the list satisfy the predicate
+
+    any :: (Foldable t) => (a -> Bool) -> t a -> Bool
+
+  iterate: Takes a function and a starting value and applies that function
+    again and again infinitely (best used with take* functions)
+
+    take 5 $ iterate (*2) 1 == [1,2,4,8,16]
+
+  splitAt: Splits a list after k number of elements, returning the two lists as a tuple
+
+    splitAt :: Int -> [a] -> ([a], [a])
+    splitAt 3 "heyman" == ("hey", "man")
+
+  takeWhile: Takes elements from a list as long as a predicate holds, going from left ot right
+
+    takeWhile :: (a -> Bool) -> [a] -> [a]
+    takeWhile (>3) [6,5,4,3,2,1,2,3,4,5] == [6,5,4]
+
+  dropWhile: Takes a list and returns a list where the elements that failed the provided
+    predicate are removed
+
+    dropWhile :: (a->Bool) -> [a] -> [a]
+
+    dropWhile (< 3) [1,2,3,4,5,1,2,3] == [3,4,5,1,2,3]
+
+  span: similar to takeWhile, but returns a pair of lists where the first element
+    is the list of elements that would have been taken by takeWhile and the second
+    element of the pair is all the elements that remained...note this is not like partition
+
+    span (/=' ') "This is a sentence" == ("This", "is a sentence")
+
+
+  break: similar to span, but the splitting point is the first time the predicate is false
+    for an element
+
+  sort: sorts a list (must have elements of the list that are instance of Ord typeclass)
+
+  !!!!!!!!!
+  group: takes a list and groups adjacent elements if they are equal
+
+    group [1,1,1,1,2,2,2,3,3,3,2,2,5,6] == [[1,1,1,1], [2,2,2], [3,3,3], [2,2], [5], [6]]
+
+
+  !!!!!!!!!
+  partition: takes a list and a predicate, returning a pair of lists where the first list
+    contains all elements that passed the predicate and the second list contains all of the 
+    elements of the input list that failed the predicate
+
+    partition (`elem` ['A'..'Z']) "ThinkPadIsSilly" == ("TPS", "hinkadsilly")
+
+
+  find: takes a list and predicate and returns the first element that satisfies
+    the predicate in a Maybe value
+
+    find :: (Foldable t) -> t a -> Maybe a
+
+
+  There are elemIndex, findIndex that returns index rather than element
+
+
+  lines: Takes a string and returns every line delimited by \n
+
+  words: Takes a string and returns a list of words that were delimited by blank space(s) or \n
+
+    words "hey there           are words in this \n sentence" 
+          == ["hey", "there", "are", "words", "in", "this", "sentence
+
+
+  \\: Set difference
+  union: Set union
+  intersect: Set intersection
+
+  Some functions (nub, delete, intersect, group) have a more generic version (groupBy)
+    where the user can provide a predicate other than (==) to test two elements against
+
+    groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+
+--7.3 Data.Char
+
+  A bunch of is* functions to check if a char is a digit, number, punctuation...
+    useful for passing as predicate
+
+--7.4 Data.Map
+
+Maps are associative lists, lists of key-value pairs
+
+
+  fromList: Takes a list of pairs (key,value) and creates a map with the same associations, duplicates discarded
+  fromListWith: Same as fromList, but user can provide a function on how to deal with duplicate keys
+
+  empty: Returns an empty map
+
+  insert: Takes a key, value, and an existing map; returns a map with the key/value pair inserted into the provided map
+
+  null: Check to see if a map is null
+
+  singleton: takes a key and a value and creates a map containing only that one key-value pair
+  
+  lookup: Looks for the value associated with the provided key in the provided map
+
+
+--7.5 Data.Set
+
+Like sets in Math
+
+Elements in a set are unique
+
+Lookup, insertion, and checking for membership are faster for Sets than Lists
+
+
+--7.5 Making Your Own Modules
+
+
+In the beginning of the .hs file, specify a module name and list of funcs to export
+
+  module Gemoetry
+  (func1,
+   func2,
+   cubeArea,
+   cuboidVolume
+  )
+
+  keys, elems: return lists of the keys/elems of a map
+
+
+  isInfixOf, isPrefix, isSuffixOf: Basically substring searching generalized to lists
+
+
+To give hiearchal structure, name a directory that has the first letter capitalized
+  and place modules within that directory, named by dir_name.module_name
+
+
+  Geometry/
+    Sphere.hs
+    Cuboid.hs
+
+  --Sphere.hs
+  module Geoemetry.Sphere
+  (sphereStuff,
+   sphereStuff2
+  )
+
+  --Cuboid.hs
+  module Cuboid.Sphere
+  (cubeStuff,
+   cubeStuff2,
+   cubeStuff3
+  )
+
