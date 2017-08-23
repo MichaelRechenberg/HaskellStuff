@@ -115,7 +115,7 @@ Guards are a method of testing whether the properties of a value are true or fal
 Guards are easier to read when testing for boolean conditions 
 
 bmiTell :: (RealFloat a) => a -> a-> String
-bmiTell weight / height
+bmiTell weight height
   | weight / height ^ 2 <= 18.5 "Underweight"
   | weight / height ^ 2 <= 25.0 "Normal weight"
   | weight / height ^ 2 <= 30.0 "Overweight
