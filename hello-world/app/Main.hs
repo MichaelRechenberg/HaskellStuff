@@ -3,6 +3,7 @@ module Main where
 import Lib
 import Sorts
 
+
 main :: IO ()
 main = do
   print(zip [1..100] (fizzBuzz [1..100]))
@@ -22,5 +23,11 @@ main = do
     in print(quickSort asdf)
   let asdf = "a quick brown fox jumped over the lazy dog"
     in print(mergeSort asdf)
+  let bob = Person {firstName="bob", lastName="brown", age=27, single=True}
+    in print(describePerson bob)
+  let input = [4, 0, -1, -44, 2, 9] in
+    print(map printValidity $ map safeSqrt input)
+
+
 
 

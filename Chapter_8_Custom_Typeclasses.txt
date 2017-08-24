@@ -1,0 +1,276 @@
+Being able to define our own types and typeclasses
+This is useful since types mesh well with pattern matching (error catching, Maybe)
+
+--8.1: Intro
+
+You define a new type by using the "data" keyword
+
+  Ex:
+      --"type Bool can be True OR False"
+      data Bool = True | False
+      data Int = -2345321521435 | -12513243214234 | ... | 0 | 1 | ...
+      --"type Maybe a can be Just a OR Nothing"
+      data Maybe a = Just a | Nothing
+
+      data Shape = Circle Float Float Float | Rectangle Float Float Float Float 
+      data List a = Empty | Cons a List
+      -- Recall that ":" is the cons operator (construction)
+      -- Recall pairs discussion in SICP Chapter 2
+
+      --Conventially used represent either a correct value or error
+      --By convention, the Left ctor contains an error value, the Right ctor contains the actual value
+      data Either a b = Left a | Right b
+
+
+  A few notes:
+    The types must be capitalized
+    "Value constructors" are to the right of the "=" sign
+      True, False, 1, Circle Float Float Float 
+      Value ctors are jus tlike any other function (currying, partial application)
+      You pattern match against an ADT's value ctors
+    "Type constructors" are to the left of the "=" sign
+      Maybe a
+      The "a" must be a concrete type (True, False, Empty) and not a container with no concrete type
+      --why a function with definition (a -> Maybe) makes no sense...it takes an "a" and turns
+      --  it into a Maybe of ... we have no idea
+
+    The label next to "data" is the name of the ADT
+
+  It is STRONG Haskell convention to NOT put class constraints in 
+    data declaration, since adding the constraint at the data
+    declaration would force all downstream users of the type
+    to make that class constraint even if unnecessary
+
+!!!!!!!!!!!!!!!!NOTE!!!!!!!!!!!!!!!!!!!
+When you export your data constructors from a module, you have
+  to export it as DataTypeName(..) (view Lib.hs at the Person(..)) line
+
+Otherwise Haskell will complain that "data constructor not in scope"
+
+See: https://stackoverflow.com/questions/8983826/export-from-module
+!!!!!!!!!!!!!!!!NOTE!!!!!!!!!!!!!!!!!!!
+
+
+
+Recall that typeclasses are like interfaces in Java/C++.  To "derive" a
+  typeclass for your custom type, use the "deriving" keyword and 
+  define functions for needed functions of your custom type using the "instance" keyword
+
+  Ex:
+
+      data Foo = Foo Integer String
+
+      instance Eq Foo where
+        (Foo x1 str1) == (Foo x2 str2) = (x1 == x2) && (str1 == str2)
+
+
+      Very common typeclasses (Eq, Ord, Bounded, Read, Show)
+        will typically allow you to avoid boilerplate by using "deriving" keyword
+
+      data Foo = Foo Integer String 
+        deriving (Eq, Ord, Show)
+
+      This will, under the hood, generate similar instance Eq code like
+        written above
+
+
+You get constructors for free with declaring data types
+
+
+Pattern Matching with Algebraic Data Types
+  Ex:
+
+      area :: Shape -> Float
+      --Make sure you wrap the ADT in ()'s in your pattern matching
+      area (Circle _ _ r) = pi * r^2
+      area (Rect x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+
+--8.2 Record Syntax
+
+Record syntax is useful for practical programming since you can
+  refer to a type's fields/members by label rather than position
+
+  Ex:
+      
+      data Person = Person { firstName :: String,
+                      lastName  :: String,
+                      age       :: Int,
+                      single    :: Bool,
+                    } deriving Show
+
+Record syntax gives you free getters and "setters" that are named after the member names 
+
+
+  --Inside GHCI
+  :t firstName
+  > firstName :: Person -> String
+
+  bob = Person { firstName="Bob", lastName="Brown", age=27, single=False }
+  lastName bob
+  > "Brown"
+
+
+  --In code
+  describePerson :: Person -> String
+  describePerson (Person {firstName=fn, age=a, single=_, lastName=ln}) --some string magic here using bound vars fn, a, and ln
+  
+
+
+
+
+-- 8.3 Type Synonyms
+
+You can define aliases for types using the "type" keyword
+
+type PhoneBook = [(String, String)]
+-- thePhoneBook = [("betty", "555-2938"), ("johnny", "333-1574")]
+
+
+--8.4 Recursive data structures
+
+Like any good math you can make recursive ADT definitions
+
+    data List a = Empty | Cons a (List a) deriving (Show, Read, Eq, Ord)
+    --Binary tree in Haskell
+    data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
+
+    --Encapsulate a value as a root node with no children
+    singleton:: a -> Tree a
+    singleton x = Node x EmptyTree EmptyTree
+
+    --"Insert" into a BST (actually making a new BST with the inserted item b/c immutability)
+    treeInsert :: (Ord a) => a -> Tree a -> Tree a
+    treeInset x EmptyTree = singleton x
+    treeInsert x (Node a left right) 
+        | x == a = Node x left right
+        | x < a = Node a (treeInsert x left) right
+        | x > a = Node a left (treeInsert x right)
+
+    --Search a BST
+    treeElem :: (Ord a ) => a -> Tree a-> Bool
+    treeElem _ EmptyTree = False
+    treeElem x (Node a left right)
+        | x == a = True
+        | x < a = treeElem x left 
+        | x > a = treeElem x right
+
+
+--8.5 Typeclasses 102
+
+Recall typeclasses are like interfaces in C++/Java
+
+Definining a new typeclass using "class" keyword
+
+    class Eq a where 
+        --define functions for instances to override
+        (==) :: a -> a -> Bool
+        (/=) :: a -> a -> Bool
+        --mutually recursive definition so an instance only needs to define either == or /=
+        x == y = not (x /= y)
+        x /= y = not (x == y)
+
+
+    -- We can subclasses other typeclasses in our custom typeclasses
+    -- Define Num typeclass that extends Eq typeclass
+    class (Eq a) => Num a where
+      ...
+
+For class constraints you should't put it in the data declarations, but
+  rather put them in class definitions or instance definitions
+
+Extended example: Yes-No typeclass (Get Javascript level type silliness in Haskell)
+
+  --define our YesNo typeclass
+  class YesNo a where
+    yesNo :: a -> Bool
+
+
+  --define instances of our YesNo typeclass
+
+  --any nonzero value is true, like in C
+  instance YesNo Int where
+    yesNo 0 = False
+    yesNo _ = True
+
+  instance YesNo [a] where
+    yesNo [] = False
+    yesNo _ = True
+
+
+  --the `id` function is a stdlib function that takes a parameter and returns that parameter itself
+  instance YesNo Bool where
+    yesNo = id
+
+
+  instance YesNo (Mayba a) where
+    yesNo (Just _ ) = True
+    yesNo nothing = False
+
+
+--8.5 The Functor Typeclass
+
+They'll be more discussion of Functors in Chapter 11 and a more rigorous approach
+  to functors will require a brief Wikipedia dive
+
+The Functor typeclass is "basically for things that can be mapped over"
+
+    class Functor f where 
+      --f is not a concrete type but rather a type constructor that takes one arg
+      --  (i.e. "types that can work like a box")
+      fmap :: (a -> b) -> f a -> f b
+
+
+    instance Functor Maybe where
+      fmap f (Just x) = Just (f x)
+      fmap f Nothing = Nothing
+
+    instance Functor Tree where
+      fmap f EmptyTree = EmptyTree
+      fmap f (Node x left right) = Node (f x) (fmap f left) (fmap f right)
+
+    --Recall the Either convention of Left contains error messages, Right contains valid values
+    --This allows fmap to "ignore" error messages by not applying the function to them
+    --  and we can later accumulate only errors (filter Lefts) only valid values (filter Rights)
+    instance Functor (Either a) where
+      fmap f (Right x) = Right (f x)
+      fmap f (Left x)  = Left x
+
+
+    --Functor requires types with kinds * -> *
+
+Our old friend `map` from lists is just fmap running on a list
+
+
+Map only one field (yabba)
+
+    instance Functor (Barry a b) where  
+        fmap f (Barry {yabba = x, dabba = y}) = Barry {yabba = f x, dabba = y}
+
+
+
+--8.6 Function "Kinds"
+
+Types have their own vocabulary of labels for themselves called "kinds"
+
+View kind of a type using :k in GHCI
+
+    :k Int
+    --A * means the type is a concrete type
+    > Int :: *
+
+    --Takes a concrete type (Int) and returns another concrete type (Maybe Int)
+    :k Maybe
+    > Maybe :: * -> *
+
+    :k Maybe Int
+    > Maybe :: * 
+
+    --Take 2 concrete types and return a concrete type
+    :k Either
+    > Either :: * -> * -> *
+
+    --Type ctors are just functions, so currying and partial application still apply
+    --This is important since fmap can only take one argument
+    :k Either String
+    >Either String :: * -> *

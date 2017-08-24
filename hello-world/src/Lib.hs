@@ -8,11 +8,18 @@ module Lib
       myCompress,
       makeClosure, 
       pack,
-      encode
+      encode,
+      --The (..) means to allow all ctors of Person 
+      --  to be exported
+      Person(..),
+      describePerson,
+      safeSqrt,
+      printValidity
     ) where
 
 import Data.Char
 import Data.List
+import Text.Printf
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -140,3 +147,33 @@ encode xs =
 --28
 makeClosure :: (Num a) => a -> a -> a
 makeClosure x = (\y -> (x + y))
+
+
+
+--Chapter 8 Practice: Making ADT
+
+data Person = Person { firstName :: String,
+                       lastName  :: String,
+                       age       :: Int,
+                       single    :: Bool}
+
+describePerson :: Person -> String
+describePerson (Person {firstName=fn, lastName=ln, age=age, single=_}) =
+  printf "%s %s is %d years old...and I won't say this person's relationship status" fn ln age
+
+
+--Getting used to the Either type
+--Finds the sqrt of a Float:
+--  Right x if x >= 0
+--  Left errorMsg if x < 0
+safeSqrt :: Float -> Either String Float
+safeSqrt x
+  | x < 0 = Left "ERROR: Negative Number"
+  | otherwise = Right $ sqrt x
+
+--Return a string displaying the value or an error message
+printValidity :: (Show a) => Either String a -> String
+printValidity (Right x) = printf "The valid value was %s" (show x)
+printValidity (Left errMsg) = printf "Error Message: %s" errMsg
+
+
